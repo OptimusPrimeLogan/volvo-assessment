@@ -1,0 +1,102 @@
+openapi: "3.0.3"
+info:
+  version: 1.0.0
+  title: REST endpoints for CTC
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: toll
+    description: toll calculation
+
+paths:
+  /api/toll/v1:
+    post:
+      tags:
+        - toll
+      summary: Process a toll request
+      description: Calculate and provide a toll ticket
+      operationId: processTollRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TollRequestPostTo"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TollResponseTo"
+        "400":
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TollErrorResponseTo"
+
+components:
+  schemas:
+    TollRequestPostTo:
+      description: Transport object contains the parameter to issue a toll ticket
+      required:
+        - licensePlate
+        - processTime
+        - vehicleType
+      type: object
+      properties:
+        licensePlate:
+          type: string
+        processTimes:
+          items:
+            $ref: "#/components/schemas/ProcessTime"
+          type: array
+        vehicleType:
+          $ref: "#/components/schemas/VehicleTypeEnum"
+    DirectionEnum:
+      type: string
+      enum:
+        - IN
+        - OUT
+    VehicleTypeEnum:
+      type: string
+      enum:
+        - GENERAL
+        - EMERGENCY
+        - BUS
+        - DIPLOMAT
+        - MOTORCYCLE
+        - MILITARY
+        - FOREIGN
+    TollResponseTo:
+      description: TO that contains response of a toll ticket
+      required:
+        - licensePlate
+        - totalAmount
+      type: object
+      properties:
+        licensePlate:
+          type: string
+        totalAmount:
+          type: number
+          multipleOf: 0.01
+    TollErrorResponseTo:
+      description: Error TO that contains response of a toll ticket issuance error
+      required:
+        - licensePlate
+        - errorCode
+        - reason
+      type: object
+      properties:
+        licensePlate:
+          type: string
+        errorCode:
+          format: int64
+          type: integer
+        reason:
+          type: string
+    ProcessTime:
+      type: string
+      format: date-time
+      description: Creation date and time
+      example: "2021-01-30T08:30:00Z"
