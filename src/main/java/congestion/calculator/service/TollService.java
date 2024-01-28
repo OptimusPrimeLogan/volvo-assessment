@@ -120,14 +120,16 @@ public class TollService {
     @SneakyThrows
     private boolean isTollFreeDate(OffsetDateTime date) {
         int year = date.getYear();
-        int month = date.getMonthValue();
+        Month month = date.getMonth();
         DayOfWeek day = date.getDayOfWeek();
         String errorInfo = "toll free dates not set for ".concat(String.valueOf(year));
+
+        if (date.getMonth() == Month.JULY) return true;
 
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) return true;
 
         if (year == yearInScope) {
-            List<PublicHoliday> publicHolidays = publicHolidaysRepository.findByMonthYear(month);
+            List<PublicHoliday> publicHolidays = publicHolidaysRepository.findByMonthYear(month.getValue());
             
             if(publicHolidays.isEmpty()){
                 log.error(errorInfo);
