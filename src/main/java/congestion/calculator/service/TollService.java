@@ -3,24 +3,25 @@ package congestion.calculator.service;
 import congestion.calculator.exception.TollException;
 import congestion.calculator.repository.PublicHolidaysRepository;
 import congestion.calculator.repository.TollFeeChartRepository;
-import congestion.calculator.repository.entity.PublicHolidays;
+import congestion.calculator.repository.entity.PublicHoliday;
+import congestion.calculator.repository.entity.TollFeeChart;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.TollRequestPostTo;
 import org.openapitools.model.TollResponseTo;
 import org.openapitools.model.VehicleTypeEnum;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
 import java.math.BigDecimal;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequestScope
+@Slf4j
 public class TollService {
 
     @Value("#{'${toll.free.vehicles}'.split(',')}")
@@ -32,8 +33,13 @@ public class TollService {
     @Value("${year.in.scope:2013}")
     private Integer yearInScope;
 
-    @Autowired private PublicHolidaysRepository publicHolidaysRepository;
-    @Autowired private TollFeeChartRepository tollFeeChartRepository;
+    private final PublicHolidaysRepository publicHolidaysRepository;
+    private final TollFeeChartRepository tollFeeChartRepository;
+
+    public TollService(PublicHolidaysRepository publicHolidaysRepository, TollFeeChartRepository tollFeeChartRepository) {
+        this.publicHolidaysRepository = publicHolidaysRepository;
+        this.tollFeeChartRepository = tollFeeChartRepository;
+    }
 
     @SneakyThrows
     public TollResponseTo getTax(TollRequestPostTo tollRequestPostTo) {
@@ -72,7 +78,7 @@ public class TollService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unable to calculate due to "+e.getMessage());
             throw TollException.createTollException(licensePlate, 1000L, e.getMessage());
         }
 
@@ -84,47 +90,63 @@ public class TollService {
         return tollFreeVehicles.contains(vehicle.getValue());
     }
 
+    @SneakyThrows
     private int getTollFee(OffsetDateTime date, VehicleTypeEnum vehicle) {
         if (isTollFreeVehicle(vehicle) || isTollFreeDate(date)) return 0;
 
         int hour = date.getHour();
         int minute = date.getMinute();
-        AtomicInteger price = new AtomicInteger();
+        int year = date.getYear();
 
         LocalTime derivedTime = LocalTime.of(hour, minute);
+        //If data per year has to be maintained, the query can be changed to findByYear
+        List<TollFeeChart> tollFeeCharts = tollFeeChartRepository.findAll();
 
-        tollFeeChartRepository.findAll().forEach(s -> {
-            if(derivedTime.isAfter(s.getStartTime()) && derivedTime.isBefore(s.getEndTime())){
-                price.set(s.getPrice().intValue());
+        if(tollFeeCharts.isEmpty()){
+            log.error("toll fee not set for "+date.getYear());
+            throw new Exception("toll fee dates not set for "+year);
+        }
+
+        for (TollFeeChart tollFeeChart : tollFeeCharts){
+            if((derivedTime.isAfter(tollFeeChart.getStartTime()) || derivedTime.equals(tollFeeChart.getStartTime()))
+                    && (derivedTime.isBefore(tollFeeChart.getEndTime())) || derivedTime.equals(tollFeeChart.getEndTime())){
+                return tollFeeChart.getPrice().intValue();
             }
-        });
+        }
 
-        return price.get();
+        return 0;
     }
 
-    private Boolean isTollFreeDate(OffsetDateTime date) {
+    @SneakyThrows
+    private boolean isTollFreeDate(OffsetDateTime date) {
         int year = date.getYear();
         int month = date.getMonthValue();
-        int dayOfTheMonth = date.getDayOfMonth();
         DayOfWeek day = date.getDayOfWeek();
-        AtomicBoolean tollFreeDate = new AtomicBoolean(false);
+        String errorInfo = "toll free dates not set for ".concat(String.valueOf(year));
 
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) return true;
 
         if (year == yearInScope) {
-            List<PublicHolidays> publicHolidays = publicHolidaysRepository.findByMonthYear(month);
-            publicHolidays.forEach(s -> {
-                OffsetDateTime holidayEve;
-                //New Year's Eve
-                if(month == 1 && dayOfTheMonth==1){
-                    holidayEve = OffsetDateTime.of(LocalDateTime.of(year, 12, 31, 0, 0), ZoneOffset.UTC);
-                }else{
-                    holidayEve = OffsetDateTime.of(LocalDateTime.of(year, month, s.getDateMonth() - 1, 0, 0), ZoneOffset.UTC);
+            List<PublicHoliday> publicHolidays = publicHolidaysRepository.findByMonthYear(month);
+            
+            if(publicHolidays.isEmpty()){
+                log.error(errorInfo);
+                throw new Exception(errorInfo);
+            }
+
+            for (PublicHoliday publicHoliday : publicHolidays) {
+                OffsetDateTime publicHolidayOffset = OffsetDateTime.of(
+                        LocalDateTime.of(yearInScope, publicHoliday.getMonthYear(), publicHoliday.getDateMonth(), date.getHour(), 0), ZoneOffset.UTC);
+
+                if (date.truncatedTo(ChronoUnit.HOURS).plusDays(1).equals(publicHolidayOffset)) {
+                    return true;
                 }
-                if (holidayEve.equals(date))
-                    tollFreeDate.set(true);
-            });
+            }
+
+        }else{
+            log.error(errorInfo);
+            throw new Exception(errorInfo);
         }
-        return tollFreeDate.get();
+        return false;
     }
 }

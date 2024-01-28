@@ -1,26 +1,26 @@
 -- https://www.officeholidays.com/countries/sweden/2024
-INSERT INTO public_holidays(month_year, date_month) values (1, 1);
-INSERT INTO public_holidays(month_year, date_month) values (1, 6);
+INSERT INTO public_holiday(month_year, date_month) values (1, 1);
+INSERT INTO public_holiday(month_year, date_month) values (1, 6);
 
-INSERT INTO public_holidays(month_year, date_month) values (3, 29);
-INSERT INTO public_holidays(month_year, date_month) values (3, 31);
+INSERT INTO public_holiday(month_year, date_month) values (3, 29);
+INSERT INTO public_holiday(month_year, date_month) values (3, 31);
 
-INSERT INTO public_holidays(month_year, date_month) values (4, 1);
+INSERT INTO public_holiday(month_year, date_month) values (4, 1);
 
-INSERT INTO public_holidays(month_year, date_month) values (5, 1);
-INSERT INTO public_holidays(month_year, date_month) values (5, 9);
-INSERT INTO public_holidays(month_year, date_month) values (5, 19);
+INSERT INTO public_holiday(month_year, date_month) values (5, 1);
+INSERT INTO public_holiday(month_year, date_month) values (5, 9);
+INSERT INTO public_holiday(month_year, date_month) values (5, 19);
 
-INSERT INTO public_holidays(month_year, date_month) values (6, 6);
-INSERT INTO public_holidays(month_year, date_month) values (6, 21);
-INSERT INTO public_holidays(month_year, date_month) values (6, 22);
+INSERT INTO public_holiday(month_year, date_month) values (6, 6);
+INSERT INTO public_holiday(month_year, date_month) values (6, 21);
+INSERT INTO public_holiday(month_year, date_month) values (6, 22);
 
-INSERT INTO public_holidays(month_year, date_month) values (9, 2);
+INSERT INTO public_holiday(month_year, date_month) values (9, 2);
 
-INSERT INTO public_holidays(month_year, date_month) values (12, 24);
-INSERT INTO public_holidays(month_year, date_month) values (12, 25);
-INSERT INTO public_holidays(month_year, date_month) values (12, 26);
-INSERT INTO public_holidays(month_year, date_month) values (12, 31);
+INSERT INTO public_holiday(month_year, date_month) values (12, 24);
+INSERT INTO public_holiday(month_year, date_month) values (12, 25);
+INSERT INTO public_holiday(month_year, date_month) values (12, 26);
+INSERT INTO public_holiday(month_year, date_month) values (12, 31);
 
 INSERT INTO toll_fee_chart(start_time, end_time, price) values ('06:00:00', '06:29:00', 8 );
 INSERT INTO toll_fee_chart(start_time, end_time, price) values ('06:30:00', '06:59:00', 13 );

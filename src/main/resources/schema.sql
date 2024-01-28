@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS public_holidays;
+DROP TABLE IF EXISTS public_holiday;
 
-CREATE TABLE public_holidays
+CREATE TABLE public_holiday
 (
   id INT AUTO_INCREMENT  PRIMARY KEY,
     month_year      TINYINT      NOT NULL,

@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "toll_free_chart")
+@Table(name = "toll_fee_chart")
 @Entity
 public class TollFeeChart {
 
