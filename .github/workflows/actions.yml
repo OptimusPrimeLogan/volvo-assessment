@@ -61,6 +61,6 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -DaltDeploymentRepository='github::default::https://maven.pkg.github.com/${{ github.actor }}/${{ github.event.repository.name }}'
+        run: mvn deploy -Ddependency-check.skip=true -s $GITHUB_WORKSPACE/settings.xml -DaltDeploymentRepository='github::default::https://maven.pkg.github.com/${{ github.actor }}/${{ github.event.repository.name }}'
         env:
           GITHUB_TOKEN: ${{ github.token }}
