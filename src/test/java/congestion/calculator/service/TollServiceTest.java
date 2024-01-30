@@ -1,18 +1,19 @@
 package congestion.calculator.service;
 
 import congestion.calculator.exception.TollException;
+import congestion.calculator.model.TollRequestPostTo;
+import congestion.calculator.model.TollResponseTo;
+import congestion.calculator.model.VehicleTypeEnum;
 import congestion.calculator.repository.PublicHolidaysRepository;
 import congestion.calculator.repository.TollFeeChartRepository;
 import congestion.calculator.repository.entity.PublicHoliday;
 import congestion.calculator.repository.entity.TollFeeChart;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.openapitools.model.TollRequestPostTo;
-import org.openapitools.model.TollResponseTo;
-import org.openapitools.model.VehicleTypeEnum;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,11 +23,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -48,6 +46,11 @@ class TollServiceTest {
                 2013, publicHolidaysRepository, tollFeeChartRepository);
     }
 
+    @AfterEach
+    void destroy(){
+        reset(publicHolidaysRepository, tollFeeChartRepository);
+    }
+
     @Test
     void getTax() {
 
@@ -62,7 +65,7 @@ class TollServiceTest {
         );
 
         PublicHoliday publicHoliday = PublicHoliday.builder().dateMonth(1).monthYear(1).build();
-        when(publicHolidaysRepository.findByMonthYear(anyInt())).thenReturn(List.of(publicHoliday));
+        when(publicHolidaysRepository.findAll()).thenReturn(List.of(publicHoliday));
 
         LocalTime from = LocalTime.of(0, 0);
         LocalTime to = LocalTime.of(23, 59, 59);
@@ -113,7 +116,7 @@ class TollServiceTest {
         );
 
         PublicHoliday publicHoliday = PublicHoliday.builder().dateMonth(9).monthYear(1).build();
-        when(publicHolidaysRepository.findByMonthYear(anyInt())).thenReturn(List.of(publicHoliday));
+        when(publicHolidaysRepository.findAll()).thenReturn(List.of(publicHoliday));
 
         //when
         TollResponseTo responseTo = underTest.getTax(tollRequestPostTo);
@@ -186,7 +189,7 @@ class TollServiceTest {
         );
 
         PublicHoliday publicHoliday = PublicHoliday.builder().dateMonth(1).monthYear(1).build();
-        when(publicHolidaysRepository.findByMonthYear(anyInt())).thenReturn(List.of(publicHoliday));
+        when(publicHolidaysRepository.findAll()).thenReturn(List.of(publicHoliday));
 
         LocalTime from = LocalTime.of(0, 0);
         LocalTime to = LocalTime.of(23, 59, 59);
@@ -223,7 +226,7 @@ class TollServiceTest {
         );
 
         PublicHoliday publicHoliday = PublicHoliday.builder().dateMonth(1).monthYear(1).build();
-        when(publicHolidaysRepository.findByMonthYear(anyInt())).thenReturn(List.of(publicHoliday));
+        when(publicHolidaysRepository.findAll()).thenReturn(List.of(publicHoliday));
 
         LocalTime from = LocalTime.of(0, 0);
         LocalTime to = LocalTime.of(15, 29, 59);
@@ -266,7 +269,7 @@ class TollServiceTest {
         );
 
         PublicHoliday publicHoliday = PublicHoliday.builder().dateMonth(1).monthYear(1).build();
-        when(publicHolidaysRepository.findByMonthYear(anyInt())).thenReturn(List.of(publicHoliday));
+        when(publicHolidaysRepository.findAll()).thenReturn(List.of(publicHoliday));
 
         LocalTime from = LocalTime.of(0, 0);
         LocalTime to = LocalTime.of(15, 29, 59);
@@ -350,7 +353,7 @@ class TollServiceTest {
                 )
         );
 
-        when(publicHolidaysRepository.findByMonthYear(anyInt())).thenReturn(new ArrayList<>());
+        when(publicHolidaysRepository.findAll()).thenReturn(new ArrayList<>());
 
         Exception exception = assertThrows(
                 Exception.class,
@@ -376,7 +379,7 @@ class TollServiceTest {
         );
 
         PublicHoliday publicHoliday = PublicHoliday.builder().dateMonth(1).monthYear(1).build();
-        when(publicHolidaysRepository.findByMonthYear(anyInt())).thenReturn(List.of(publicHoliday));
+        when(publicHolidaysRepository.findAll()).thenReturn(List.of(publicHoliday));
 
         Exception exception = assertThrows(
                 Exception.class,

@@ -1,15 +1,15 @@
 package congestion.calculator.service;
 
 import congestion.calculator.exception.TollException;
+import congestion.calculator.model.TollRequestPostTo;
+import congestion.calculator.model.TollResponseTo;
+import congestion.calculator.model.VehicleTypeEnum;
 import congestion.calculator.repository.PublicHolidaysRepository;
 import congestion.calculator.repository.TollFeeChartRepository;
 import congestion.calculator.repository.entity.PublicHoliday;
 import congestion.calculator.repository.entity.TollFeeChart;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.openapitools.model.TollRequestPostTo;
-import org.openapitools.model.TollResponseTo;
-import org.openapitools.model.VehicleTypeEnum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
@@ -64,8 +64,7 @@ public class TollService {
 
             OffsetDateTime intervalStart = dates.get(0);
 
-            for (int i = 0; i < dates.size(); i++) {
-                OffsetDateTime date = dates.get(i);
+            for (OffsetDateTime date : dates) {
                 int nextFee = getTollFee(date);
                 int tempFee = getTollFee(intervalStart);
 
@@ -140,12 +139,18 @@ public class TollService {
         DayOfWeek day = date.getDayOfWeek();
         String errorInfo = "toll free dates not set for ".concat(String.valueOf(year));
 
-        if (date.getMonth() == Month.JULY) return true;
+        if (month == Month.JULY) return true;
 
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) return true;
 
         if (year == yearInScope) {
             List<PublicHoliday> publicHolidays = publicHolidaysRepository.findAll();
+
+            if (publicHolidays.isEmpty()) {
+                log.error(errorInfo);
+                throw new Exception(errorInfo);
+            }
+
             for (PublicHoliday publicHoliday : publicHolidays) {
                 OffsetDateTime publicHolidayOffset = OffsetDateTime.of(
                         LocalDateTime.of(yearInScope, publicHoliday.getMonthYear(), publicHoliday.getDateMonth(), date.getHour(), 0), ZoneOffset.UTC);
