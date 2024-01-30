@@ -8,8 +8,9 @@ Clone this repository to get started. Due to a number of reasons, not least priv
 
 # _The below comments are for the interview panel:_
 
-The project is enriched with the following features:
+The project can be run as ``mvn clean spring-boot:run``
 
+The project is enriched with the following features:
 - Open API generator plugin is being used, which helps in generating the API backbone and transfer objects that can be used in backend development. 
 - Swagger is enabled along with OpenAPI spec, once the server is up, go to http://localhost:8080/swagger-ui/index.html
 - Using micrometer data collection for observability metrics, the prometheus compatible metrics can be found http://localhost:8080/actuator/prometheus
@@ -19,7 +20,7 @@ The project is enriched with the following features:
 - I have stacked the microserver, prometheus and grafana in a docker-compose file, simple type ``docker-compose build`` and ``docker-compose up -d``
 - Check for metrics start with ProcessTollRequest
 
-Important Links:
+Important Links in DEV environment:
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
 - Prometheus: http://localhost:9090/graph
 - Grafana: http://localhost:3000/ (default credentials -> admin/admin)
