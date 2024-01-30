@@ -14,7 +14,8 @@ The project is enriched with the following features:
 - Swagger is enabled along with OpenAPI spec, once the server is up, go to http://localhost:8080/swagger-ui/index.html
 - Using micrometer data collection for observability metrics, the prometheus compatible metrics can be found http://localhost:8080/actuator/prometheus
 - The metrics are emitted and collected from the controller class as an example, once the server is up, trigger some requests and go to http://localhost:8080/actuator/prometheus and the search for ProcessTollRequest.
-- JaCoCo code coverage is available ``/target/site/jacoco``
+- JaCoCo code coverage is available ``/target/site/jacoco/index.html``
+- OWASP dependency check happens during verify goals and be found at ```/target/dependency-check-report.html```
 - I have stacked the microserver, prometheus and grafana in a docker-compose file, simple type ``docker-compose build`` and ``docker-compose up -d``
 - Check for metrics start with ProcessTollRequest
 
