@@ -41,7 +41,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Test
+      - name: Verify
         run: mvn -B clean verify --file pom.xml
 
   publish:
@@ -61,6 +61,6 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -DaltDeploymentRepository='github::default::https://maven.pkg.github.com/${{ github.actor }}/${{ github.event.repository.name }}'
         env:
           GITHUB_TOKEN: ${{ github.token }}
