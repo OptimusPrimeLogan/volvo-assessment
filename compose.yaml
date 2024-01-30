@@ -1,11 +1,11 @@
-version: '3'
+version: '3.8'
+
 services:
-  web:
+  app:
     build: .
+    container_name: app
     ports:
       - "8080:8080"
-    volumes:
-      - .:/code
   prometheus:
     image: prom/prometheus
     container_name: prometheus
