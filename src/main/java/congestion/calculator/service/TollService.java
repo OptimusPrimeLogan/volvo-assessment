@@ -26,6 +26,7 @@ public class TollService {
 
     private final List<String> tollFreeVehicles;
 
+    // a vehicle that passes several tolling stations within the below configurable minutes
     private final Long minutesAllowedFor;
 
     private final Integer yearInScope;
@@ -44,6 +45,12 @@ public class TollService {
         this.tollFeeChartRepository = tollFeeChartRepository;
     }
 
+    /***
+     * Method to handle the request from the controller
+     * @param tollRequestPostTo {@link TollRequestPostTo}
+     * @return {@link TollResponseTo}
+     *@throws TollException if the master values are not set
+     */
     @SneakyThrows
     public TollResponseTo getTax(TollRequestPostTo tollRequestPostTo) {
 
@@ -56,6 +63,7 @@ public class TollService {
             vehicle = tollRequestPostTo.getVehicleType();
             licensePlate = tollRequestPostTo.getLicensePlate();
 
+            //Can be returned as ZERO here itself for toll-free vehicles
             if (isTollFreeVehicle(vehicle)) {
                 return new TollResponseTo(licensePlate, new BigDecimal(totalFee));
             }
@@ -92,6 +100,12 @@ public class TollService {
         return new TollResponseTo(licensePlate, new BigDecimal(totalFee));
     }
 
+    /**
+     * Method to check if the vehicle is toll-free
+     * @param vehicle {@link VehicleTypeEnum}
+     * @return a boolean
+     * @throws Exception if the value is not set
+     */
     @SneakyThrows
     private boolean isTollFreeVehicle(VehicleTypeEnum vehicle) {
         if (vehicle == null) return false;
@@ -105,6 +119,12 @@ public class TollService {
         return tollFreeVehicles.contains(vehicle.getValue());
     }
 
+    /**
+     * Method to get the toll fee based on inputs
+     * @param date {@link OffsetDateTime}
+     * @return the toll amount
+     * @throws Exception if the value is not set
+     */
     @SneakyThrows
     private int getTollFee(OffsetDateTime date) {
         if (isTollFreeDate(date)) return 0;
@@ -132,6 +152,12 @@ public class TollService {
         return 0;
     }
 
+    /**
+     * Method to find the dates are meant for no toll collection
+     * @param date {@link OffsetDateTime}
+     * @return a boolean
+     * @throws Exception if the value is not set
+     */
     @SneakyThrows
     private boolean isTollFreeDate(OffsetDateTime date) {
         int year = date.getYear();

@@ -1,11 +1,14 @@
 package congestion.calculator.exception;
 
-import org.openapitools.model.TollErrorResponseTo;
+import congestion.calculator.model.TollErrorResponseTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * Global exception handle to rephrase messages
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler({TollException.class})

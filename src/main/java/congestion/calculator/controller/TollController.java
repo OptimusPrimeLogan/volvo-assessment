@@ -1,19 +1,26 @@
 package congestion.calculator.controller;
 
+import congestion.calculator.api.TollApi;
+import congestion.calculator.model.TollRequestPostTo;
+import congestion.calculator.model.TollResponseTo;
 import congestion.calculator.service.TollService;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
-import org.openapitools.api.TollApi;
-import org.openapitools.model.TollRequestPostTo;
-import org.openapitools.model.TollResponseTo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller class to handle toll calculation requests
+ */
 @RestController
 public class TollController implements TollApi {
 
     private final TollService service;
 
+    /**
+     * Constructor injection
+     * @param service {@link TollService}
+     */
     public TollController(TollService service) {
         this.service = service;
     }

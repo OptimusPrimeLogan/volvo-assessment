@@ -123,6 +123,8 @@
 								<dateLibrary>java8</dateLibrary>
 								<interfaceOnly>true</interfaceOnly>
 								<documentationProvider>springdoc</documentationProvider>
+								<apiPackage>congestion.calculator.api</apiPackage>
+								<modelPackage>congestion.calculator.model</modelPackage>
 								<additionalModelTypeAnnotations>
 									@lombok.Setter
 									@lombok.Getter
