@@ -1,11 +1,16 @@
 package congestion.calculator.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import congestion.calculator.exception.TollException;
 import congestion.calculator.service.TollService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.TollRequestPostTo;
 import org.openapitools.model.TollResponseTo;
+import org.openapitools.model.VehicleTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -13,6 +18,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -31,6 +40,12 @@ class TollControllerTest {
     @MockBean
     TollService tollService;
 
+    TollResponseTo tollResponseTo = new TollResponseTo("LP", new BigDecimal(0));
+
+    ObjectMapper mapper = JsonMapper.builder()
+            .addModule(new JavaTimeModule())
+            .build();
+
     @BeforeEach
     void setUp() {
         openMocks(this);
@@ -44,11 +59,21 @@ class TollControllerTest {
     @Test
     void processTollRequest_Valid() throws Exception {
 
-        TollResponseTo tollResponseTo = new TollResponseTo("LP", new BigDecimal(0));
+        TollRequestPostTo tollRequestPostTo = new TollRequestPostTo("LP", VehicleTypeEnum.GENERAL);
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("16:00:00"),
+                        ZoneOffset.UTC
+                )
+        );
 
         when(tollService.getTax(any())).thenReturn(tollResponseTo);
 
-        this.mockMvc.perform(post("/api/toll/v1").contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/api/toll/v1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(tollRequestPostTo))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.licensePlate").value("LP"))
@@ -58,6 +83,16 @@ class TollControllerTest {
 
     @Test
     void processTollRequest_WhenAnExceptionThrown() throws Exception {
+
+        TollRequestPostTo tollRequestPostTo = new TollRequestPostTo("LP", VehicleTypeEnum.GENERAL);
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("16:00:00"),
+                        ZoneOffset.UTC
+                )
+        );
+
         doAnswer((invocation) -> {
             throw TollException.createTollException("LP", 1000L,
                     "TEST");

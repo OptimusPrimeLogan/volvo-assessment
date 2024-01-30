@@ -1,18 +1,30 @@
 package congestion.calculator.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Setter(value = AccessLevel.PACKAGE)
+@Getter
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "public_holiday")
 @Entity
 public class PublicHoliday {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
+    @Id @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 

@@ -1,6 +1,7 @@
 package congestion.calculator.repository;
 
 import congestion.calculator.repository.entity.PublicHoliday;
+import congestion.calculator.repository.entity.TollFeeChart;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
+import java.time.LocalTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
@@ -19,23 +23,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TollFeeChartRepositoryTest {
 
     @Autowired
-    PublicHolidaysRepository publicHolidaysRepository;
+    TollFeeChartRepository tollFeeChartRepository;
 
     @BeforeEach
     public void setUp() {
-        publicHolidaysRepository.deleteAll();
-        PublicHoliday publicHoliday = PublicHoliday.builder().dateMonth(1).monthYear(1).build();
-        publicHolidaysRepository.save(publicHoliday);
+        tollFeeChartRepository.deleteAll();
+        TollFeeChart tollFeeChart = TollFeeChart.builder().startTime(LocalTime.now()).endTime(LocalTime.now()).price(new BigDecimal(0)).build();
+        tollFeeChartRepository.save(tollFeeChart);
     }
 
     @AfterEach
     public void destroy() {
-        publicHolidaysRepository.deleteAll();
+        tollFeeChartRepository.deleteAll();
     }
 
     @Test
     void findByMonthYear() {
-        assertEquals(1, publicHolidaysRepository.findAll().size());
-        assertEquals(1, publicHolidaysRepository.findByMonthYear(1).size());
+        assertEquals(1, tollFeeChartRepository.findAll().size());
     }
 }

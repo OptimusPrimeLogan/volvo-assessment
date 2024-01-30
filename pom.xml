@@ -99,6 +99,12 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<excludes>
+						<exclude>CalculatorApplication.class</exclude>
+						<exclude>org/openapitools/**/*</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.openapitools</groupId>
