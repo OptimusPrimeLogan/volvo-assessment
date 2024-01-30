@@ -1,6 +1,7 @@
 package congestion.calculator.service;
 
 import congestion.calculator.exception.TollException;
+import congestion.calculator.model.TollDateResponseTo;
 import congestion.calculator.model.TollRequestPostTo;
 import congestion.calculator.model.TollResponseTo;
 import congestion.calculator.model.VehicleTypeEnum;
@@ -17,7 +18,10 @@ import org.springframework.web.context.annotation.RequestScope;
 import java.math.BigDecimal;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequestScope
@@ -58,6 +62,7 @@ public class TollService {
         VehicleTypeEnum vehicle;
         int totalFee = 0;
         List<OffsetDateTime> dates;
+        List<TollDateResponseTo> tollResponseTos = new ArrayList<>();
 
         try {
             vehicle = tollRequestPostTo.getVehicleType();
@@ -65,39 +70,50 @@ public class TollService {
 
             //Can be returned as ZERO here itself for toll-free vehicles
             if (isTollFreeVehicle(vehicle)) {
-                return new TollResponseTo(licensePlate, new BigDecimal(totalFee));
+                TollDateResponseTo tollDateResponseTo = new TollDateResponseTo(LocalDate.now()).totalAmount(BigDecimal.ZERO);
+                return new TollResponseTo(licensePlate, List.of(tollDateResponseTo), BigDecimal.ZERO);
             }
 
             dates = tollRequestPostTo.getProcessTimes();
 
-            OffsetDateTime intervalStart = dates.get(0);
+            Map<Integer, List<OffsetDateTime>> dateBuckets = dates.stream()
+                    .collect(Collectors.groupingBy(item -> item.toLocalDate().getDayOfMonth()));
 
-            for (OffsetDateTime date : dates) {
-                int nextFee = getTollFee(date);
-                int tempFee = getTollFee(intervalStart);
+            for (List<OffsetDateTime> dateBucket: dateBuckets.values()){//Per Date
+                OffsetDateTime intervalStart = dateBucket.get(0);
+                int dayTollFee = 0;
+                for (OffsetDateTime date : dateBucket) {// Per Time
+                    int nextFee = getTollFee(date);
+                    int tempFee = getTollFee(intervalStart);
 
-                long diffInMillis = date.toInstant().toEpochMilli() - intervalStart.toInstant().toEpochMilli();
-                long minutes = diffInMillis / 1000 / 60;
+                    long diffInMillis = date.toInstant().toEpochMilli() - intervalStart.toInstant().toEpochMilli();
+                    long minutes = diffInMillis / 1000 / 60;
 
-                if (minutes <= minutesAllowedFor) {
-                    if (totalFee > 0) totalFee -= tempFee;
-                    if (nextFee >= tempFee) tempFee = nextFee;
-                    totalFee += tempFee;
-                } else {
-                    totalFee += nextFee;
+                    if (minutes <= minutesAllowedFor) {
+                        if (dayTollFee > 0) dayTollFee -= tempFee;
+                        if (nextFee >= tempFee) tempFee = nextFee;
+                        dayTollFee += tempFee;
+                    } else {
+                        dayTollFee += nextFee;
+                    }
+
+                    if (dayTollFee > 60) {
+                        dayTollFee = 60;
+                        break;
+                    }
                 }
-
-                if (totalFee > 60) {
-                    totalFee = 60;
-                    break;
-                }
+                TollDateResponseTo tollDateResponseTo = new TollDateResponseTo(intervalStart.toLocalDate()).totalAmount(new BigDecimal(dayTollFee));
+                tollResponseTos.add(tollDateResponseTo);
+                totalFee += dayTollFee;
             }
+
+
         } catch (Exception e) {
             log.error("Unable to calculate due to " + e.getMessage());
             throw TollException.createTollException(licensePlate, 1000L, e.getMessage());
         }
 
-        return new TollResponseTo(licensePlate, new BigDecimal(totalFee));
+        return new TollResponseTo(licensePlate, tollResponseTos, new BigDecimal(totalFee));
     }
 
     /**

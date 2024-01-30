@@ -72,11 +72,29 @@ components:
       description: TO that contains response of a toll ticket
       required:
         - licensePlate
+        - dateWiseAmount
         - totalAmount
       type: object
       properties:
         licensePlate:
           type: string
+        dateWiseAmount:
+          items:
+            $ref: "#/components/schemas/TollDateResponseTo"
+          type: array
+        totalAmount:
+          type: number
+          multipleOf: 0.01
+    TollDateResponseTo:
+      description: TO that contains response of a toll ticket
+      required:
+        - tollDate
+        - dayAmount
+      type: object
+      properties:
+        tollDate:
+          type: string
+          format: date
         totalAmount:
           type: number
           multipleOf: 0.01

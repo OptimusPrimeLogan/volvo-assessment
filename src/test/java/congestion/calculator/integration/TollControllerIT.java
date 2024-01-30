@@ -277,4 +277,70 @@ class TollControllerIT {
                 .andReturn();
     }
 
+    @Test
+    void maxTollFeesPerDay() throws Exception {
+
+        TollRequestPostTo tollRequestPostTo = new TollRequestPostTo("LP", VehicleTypeEnum.GENERAL);
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("06:29:00"),
+                        ZoneOffset.UTC
+                )
+        );
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("07:59:00"),
+                        ZoneOffset.UTC
+                )
+        );
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("09:01:00"),
+                        ZoneOffset.UTC
+                )
+        );
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("10:12:00"),
+                        ZoneOffset.UTC
+                )
+        );
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("15:12:00"),
+                        ZoneOffset.UTC
+                )
+        );
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-14"),
+                        LocalTime.parse("16:25:00"),
+                        ZoneOffset.UTC
+                )
+        );
+
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-01-15"),
+                        LocalTime.parse("16:25:00"),
+                        ZoneOffset.UTC
+                )
+        );
+
+        this.mockMvc.perform(post("/api/toll/v1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(tollRequestPostTo))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.licensePlate").value("LP"))
+                .andExpect(jsonPath("$.totalAmount").value("78"))
+                .andReturn();
+    }
+
 }

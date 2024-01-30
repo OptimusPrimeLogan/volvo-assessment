@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -40,7 +41,7 @@ class TollControllerTest {
     @MockBean
     TollService tollService;
 
-    TollResponseTo tollResponseTo = new TollResponseTo("LP", new BigDecimal(0));
+    TollResponseTo tollResponseTo = new TollResponseTo("LP", new ArrayList<>(), new BigDecimal(0));
 
     ObjectMapper mapper = JsonMapper.builder()
             .addModule(new JavaTimeModule())
