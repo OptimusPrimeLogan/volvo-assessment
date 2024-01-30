@@ -19,6 +19,7 @@ The project is enriched with the following features:
 - OWASP dependency check happens during verify goals and be found at ```/target/dependency-check-report.html```
 - I have stacked the microserver, prometheus and grafana in a docker-compose file, simple type ``docker-compose build`` and ``docker-compose up -d``
 - Check for metrics start with ProcessTollRequest
+- Continuous Integration (CI) is implemented by GitHub Actions
 
 Important Links in DEV environment:
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
