@@ -110,6 +110,8 @@
 					<excludes>
 						<exclude>CalculatorApplication.class</exclude>
 						<exclude>org/openapitools/**/*</exclude>
+						<exclude>congestion/calculator/api/*</exclude>
+						<exclude>congestion/calculator/model/*</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
