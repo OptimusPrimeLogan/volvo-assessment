@@ -106,6 +106,29 @@ class TollControllerIT {
     }
 
     @Test
+    void dayOfPublicHoliday() throws Exception {
+
+        TollRequestPostTo tollRequestPostTo = new TollRequestPostTo("LP", VehicleTypeEnum.GENERAL);
+        tollRequestPostTo.addProcessTimesItem(
+                OffsetDateTime.of(
+                        LocalDate.parse("2013-05-01"),
+                        LocalTime.parse("16:00:00"),
+                        ZoneOffset.UTC
+                )
+        );
+
+        this.mockMvc.perform(post("/api/toll/v1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(tollRequestPostTo))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.licensePlate").value("LP"))
+                .andExpect(jsonPath("$.totalAmount").value("0"))
+                .andReturn();
+    }
+
+    @Test
     void monthOfJuly() throws Exception {
 
         TollRequestPostTo tollRequestPostTo = new TollRequestPostTo("LP", VehicleTypeEnum.GENERAL);

@@ -197,7 +197,8 @@ public class TollService {
                 OffsetDateTime publicHolidayOffset = OffsetDateTime.of(
                         LocalDateTime.of(yearInScope, publicHoliday.getMonthYear(), publicHoliday.getDateMonth(), date.getHour(), 0), ZoneOffset.UTC);
 
-                if (date.truncatedTo(ChronoUnit.HOURS).plusDays(1).equals(publicHolidayOffset)) {
+                //Day before public holiday OR date of public holiday
+                if (date.truncatedTo(ChronoUnit.HOURS).plusDays(1).equals(publicHolidayOffset) || date.truncatedTo(ChronoUnit.HOURS).equals(publicHolidayOffset)) {
                     return true;
                 }
             }
