@@ -97,6 +97,8 @@ public class TollService {
                         dayTollFee += nextFee;
                     }
 
+                    intervalStart = date;
+
                     if (dayTollFee > 60) {
                         dayTollFee = 60;
                         break;
